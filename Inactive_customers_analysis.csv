@@ -1,0 +1,88 @@
+customer_id,recency,frequency, monetary ,cluster,segment,priority_segment
+8,645,3," 119,410.44 ",3,Inactive,Low-Value Churned
+15,38,13," 54,849.32 ",3,Inactive,Mid-Level
+29,423,44," 328,602.95 ",3,Inactive,High-Value Churned
+46,715,6," 338,682.76 ",3,Inactive,High-Value Churned
+59,429,17," 168,064.46 ",3,Inactive,High-Value Churned
+62,508,3," 89,373.10 ",3,Inactive,Low-Value Churned
+77,409,15," 209,047.58 ",3,Inactive,High-Value Churned
+103,624,7," 61,403.72 ",3,Inactive,Low-Value Churned
+105,443,19," 290,999.25 ",3,Inactive,High-Value Churned
+110,644,16," 130,304.62 ",3,Inactive,High-Value Churned
+112,682,2," 87,614.54 ",3,Inactive,Low-Value Churned
+113,247,26," 109,448.11 ",3,Inactive,Review Manually
+115,260,39," 77,888.98 ",3,Inactive,Review Manually
+117,199,20," 462,580.14 ",3,Inactive,Review Manually
+131,575,23," 107,376.99 ",3,Inactive,Review Manually
+132,444,5," 500,627.40 ",3,Inactive,High-Value Churned
+142,351,1," 1,159,587.00 ",3,Inactive,High-Value Churned
+149,289,13," 24,257.17 ",3,Inactive,Review Manually
+153,409,41," 373,420.34 ",3,Inactive,High-Value Churned
+154,555,6," 1,722,537.31 ",3,Inactive,High-Value Churned
+160,276,30," 237,323.56 ",3,Inactive,High-Value Churned
+163,703,2," 4,344.83 ",3,Inactive,Low-Value Churned
+171,66,14," 214,330.03 ",3,Inactive,Mid-Level
+173,147,12," 535,378.97 ",3,Inactive,High-ROI Priority
+180,346,2," 226,465.36 ",3,Inactive,High-Value Churned
+193,339,32," 242,434.99 ",3,Inactive,High-Value Churned
+201,680,4," 182,943.97 ",3,Inactive,High-Value Churned
+224,522,3," 27,353.44 ",3,Inactive,Low-Value Churned
+229,164,13," 347,702.76 ",3,Inactive,High-ROI Priority
+231,646,11," 25,224.83 ",3,Inactive,Review Manually
+232,105,28," 162,846.00 ",3,Inactive,High-ROI Priority
+238,700,5," 88,357.94 ",3,Inactive,Low-Value Churned
+244,211,16," 400,836.05 ",3,Inactive,Mid-Level
+249,274,37," 73,623.63 ",3,Inactive,Review Manually
+252,60,7," 46,164.56 ",3,Inactive,Review Manually
+265,57,21," 47,868.08 ",3,Inactive,High-ROI Priority
+269,206,39," 217,457.72 ",3,Inactive,Mid-Level
+275,409,35," 29,983.88 ",3,Inactive,Review Manually
+286,23,10," 59,243.94 ",3,Inactive,Mid-Level
+287,626,6," 900,000.00 ",3,Inactive,High-Value Churned
+290,260,72," 135,272.81 ",3,Inactive,Mid-Level
+304,148,16," 223,022.50 ",3,Inactive,Mid-Level
+307,347,20," 715,141.14 ",3,Inactive,High-Value Churned
+309,88,24," 226,243.27 ",3,Inactive,High-ROI Priority
+315,448,7," 333,670.69 ",3,Inactive,High-Value Churned
+319,50,21," 48,278.30 ",3,Inactive,High-ROI Priority
+320,66,2," 132,413.83 ",3,Inactive,Mid-Level
+327,347,6," 325,481.60 ",3,Inactive,High-Value Churned
+329,618,4," 128,750.00 ",3,Inactive,Low-Value Churned
+332,288,9," 129,510.01 ",3,Inactive,Low-Value Churned
+333,252,9," 246,195.94 ",3,Inactive,Mid-Level
+335,697,4," 11,330.00 ",3,Inactive,Low-Value Churned
+337,261,22," 859,641.85 ",3,Inactive,Review Manually
+338,399,8," 70,420.17 ",3,Inactive,Low-Value Churned
+343,113,6," 326,327.28 ",3,Inactive,High-ROI Priority
+350,541,3," 115,782.42 ",3,Inactive,Low-Value Churned
+356,322,29," 779,991.01 ",3,Inactive,High-Value Churned
+358,151,3," 63,898.27 ",3,Inactive,Review Manually
+359,333,2," 33,530.17 ",3,Inactive,Low-Value Churned
+364,526,49," 73,669.71 ",3,Inactive,Review Manually
+365,661,23," 91,896.20 ",3,Inactive,Review Manually
+366,224,23," 33,915.19 ",3,Inactive,Review Manually
+374,25,10," 53,814.85 ",3,Inactive,Mid-Level
+382,415,20," 88,791.46 ",3,Inactive,Review Manually
+385,233,3," 283,857.60 ",3,Inactive,Mid-Level
+388,112,2," 286,840.20 ",3,Inactive,Mid-Level
+390,526,17," 20,129.74 ",3,Inactive,Review Manually
+391,452,2," 453,086.40 ",3,Inactive,High-Value Churned
+398,308,23," 73,303.70 ",3,Inactive,Review Manually
+399,375,38," 55,594.80 ",3,Inactive,Review Manually
+403,294,22," 282,680.68 ",3,Inactive,High-Value Churned
+405,98,16," 388,692.88 ",3,Inactive,High-ROI Priority
+407,290,21," 203,142.93 ",3,Inactive,High-Value Churned
+408,129,9," 16,418.10 ",3,Inactive,Review Manually
+411,169,20," 268,659.32 ",3,Inactive,High-ROI Priority
+429,641,2," 85,364.23 ",3,Inactive,Low-Value Churned
+436,633,1," 1,432,431.00 ",3,Inactive,High-Value Churned
+440,290,9," 683,990.25 ",3,Inactive,High-Value Churned
+446,430,3," 20,735.73 ",3,Inactive,Low-Value Churned
+461,695,48," 32,168.96 ",3,Inactive,Review Manually
+463,669,2," 343,980.00 ",3,Inactive,High-Value Churned
+532,171,1," 15,601.41 ",3,Inactive,Review Manually
+534,109,27," 35,432.09 ",3,Inactive,High-ROI Priority
+557,102,18," 126,204.82 ",3,Inactive,Mid-Level
+573,102,12," 155,433.11 ",3,Inactive,Mid-Level
+711,53,7," 31,422.41 ",3,Inactive,Review Manually
+717,7,1," 89,954.25 ",3,Inactive,Review Manually
