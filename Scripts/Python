@@ -1,0 +1,214 @@
+# ----------------------------
+# Customer Segmentation & Churn Prediction Pipeline
+# ----------------------------
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import (
+    confusion_matrix,
+    classification_report,
+    ConfusionMatrixDisplay
+)
+
+# ----------------------------------------
+# DATA CLEANING & PREPARATION
+# ----------------------------------------
+
+def clean_sales_data(df):
+    # Fill missing sales_qty
+    df.loc[df['sales_qty'].isnull(), 'sales_qty'] = np.round(
+        df['sales_amount'] / df['unit_price']
+    )
+    df['unit_price'] = df['sales_amount'] / df['sales_qty']
+
+    # Estimate missing unit_cost using median margin %
+    df['unit_cost_estimated'] = df['unit_cost'] == 0
+    valid = df[(df['unit_cost'] > 0) & (df['unit_price'] > 0)].copy()
+    valid['margin_pct'] = (valid['unit_price'] - valid['unit_cost']) / valid['unit_price']
+    median_margin_pct = valid['margin_pct'].median()
+
+    def estimate_cost(row):
+        if row['unit_cost'] == 0 and pd.notna(row['unit_price']):
+            return round(max(row['unit_price'] * (1 - median_margin_pct), 0.0), 2)
+        return row['unit_cost']
+
+    df['unit_cost'] = df.apply(estimate_cost, axis=1)
+    return df
+
+def drop_unwanted_columns(df):
+    cols_to_drop = [
+        'sales_s_key', 'version', 'prod_s_key', 'salesperson_s_key',
+        'sales_amount_vat', 'sales_measure', 'sales_bags', 'post_date',
+        'ship_date', 'due_date', 'invoice_ln_no', 'salesperson_region',
+        'prod_type_desc', 'date_from', 'date_to', 'sales_no', 'lpo',
+        'sales_type', 'prod_base_uom_type'
+    ]
+    df.drop(columns=cols_to_drop, inplace=True)
+    return df
+
+# ----------------------------------------
+# RFM ANALYSIS
+# ----------------------------------------
+
+def generate_rfm(df):
+    df['order_date'] = pd.to_datetime(df['order_date'])
+    ref_date = df['order_date'].max() + pd.Timedelta(days=1)
+
+    rfm = df.groupby('cust_s_key').agg({
+        'order_date': lambda x: (ref_date - x.max()).days,
+        'sales_orderno': 'count',
+        'sales_amount': 'sum'
+    }).reset_index()
+
+    rfm.columns = ['customer_id', 'recency', 'frequency', 'monetary']
+    return rfm
+
+def scale_rfm(rfm_df):
+    rfm_log = rfm_df[['recency', 'frequency', 'monetary']].apply(np.log1p)
+    scaler = StandardScaler()
+    rfm_scaled = scaler.fit_transform(rfm_log)
+    return rfm_scaled, rfm_log
+
+# ----------------------------------------
+# K-MEANS SEGMENTATION
+# ----------------------------------------
+
+def kmeans_segmentation(rfm_scaled, rfm_df, n_clusters=4):
+    kmeans = KMeans(n_clusters=n_clusters, random_state=42)
+    rfm_df['cluster'] = kmeans.fit_predict(rfm_scaled)
+
+    # Segment mapping (adjust based on your clustering result)
+    segment_map = {
+        0: 'Champions',
+        2: 'Potential Loyalists',
+        1: 'Regulars',
+        3: 'Inactive'
+    }
+    rfm_df['segment'] = rfm_df['cluster'].map(segment_map)
+    return rfm_df
+
+# ----------------------------------------
+# CHURN ANALYSIS
+# ----------------------------------------
+
+def label_churn(rfm_df, recency_threshold=180):
+    rfm_df['churned'] = (rfm_df['recency'] > recency_threshold).astype(int)
+    return rfm_df
+
+def priority_segmentation(at_risk_df):
+    def assign_priority(row):
+        if (row['frequency'] >= 20 or row['monetary'] >= 300000) and row['recency'] <= 180:
+            return 'High-ROI Priority'
+        elif (10 <= row['frequency'] < 20 or 130000 <= row['monetary'] < 300000) and row['recency'] <= 270:
+            return 'Mid-Level'
+        elif row['recency'] > 270 and row['monetary'] >= 130000:
+            return 'High-Value Churned'
+        elif row['recency'] > 270 and row['monetary'] < 130000 and row['frequency'] < 10:
+            return 'Low-Value Churned'
+        else:
+            return 'Review Manually'
+
+    at_risk_df['priority_segment'] = at_risk_df.apply(assign_priority, axis=1)
+    return at_risk_df
+
+# ----------------------------------------
+# CHURN PREDICTION
+# ----------------------------------------
+
+def churn_prediction_model(rfm_df):
+    rfm_df['churned'] = (rfm_df['recency'] > 180).astype(int)
+    y = rfm_df['churned']
+
+    X = rfm_df[['recency', 'frequency', 'monetary']].copy()
+    X['recency_log'] = np.log1p(X['recency'])
+    X['frequency_log'] = np.log1p(X['frequency'])
+    X['monetary_log'] = np.log1p(X['monetary'])
+    X_final = X[['recency_log', 'frequency_log', 'monetary_log']]
+
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X_final)
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X_final, y, test_size=0.2, random_state=42, stratify=y
+    )
+
+    rf = RandomForestClassifier(class_weight='balanced', random_state=42)
+    rf.fit(X_train, y_train)
+    y_pred = rf.predict(X_test)
+
+    print("\nConfusion Matrix:\n", confusion_matrix(y_test, y_pred))
+    print("\nClassification Report:\n", classification_report(y_test, y_pred))
+
+    # Churn probabilities for all customers
+    rfm_df['churn_probability'] = rf.predict_proba(X_final)[:, 1]
+
+    # Cross-validation
+    scores = cross_val_score(rf, X_scaled, y, cv=5)
+    print("Cross-val scores:", scores)
+    print("Mean accuracy:", scores.mean())
+
+    # Confusion matrix plot
+    cm = confusion_matrix(y_test, y_pred)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["Not Churned", "Churned"])
+    disp.plot(cmap='Blues')
+    plt.title("Confusion Matrix")
+    plt.show()
+
+    return rfm_df
+
+def classify_priority(rfm_df):
+    monetary_75 = rfm_df['monetary'].quantile(0.50)
+    frequency_median = rfm_df['frequency'].median()
+
+    def priority(row):
+        if row['churn_probability'] >= 0.7 and row['monetary'] >= monetary_75 and row['recency'] < 300 and row['frequency'] >= frequency_median:
+            return 'High Priority'
+        elif 0.5 <= row['churn_probability'] < 0.7 and row['recency'] < 400:
+            return 'Medium Priority'
+        else:
+            return 'Low Priority'
+
+    rfm_df['priority_segment'] = rfm_df.apply(priority, axis=1)
+    return rfm_df
+
+# ----------------------------------------
+# ENTRY POINT
+# ----------------------------------------
+
+if __name__ == "__main__":
+    # Load your data here
+    df_sales = pd.read_csv("data/raw/sales_data.csv")
+
+    # Cleaning & Prep
+    df_sales = clean_sales_data(df_sales)
+    df_sales = drop_unwanted_columns(df_sales)
+    df_sales['order_date'] = pd.to_datetime(df_sales['order_date'])
+
+    # RFM + Segmentation
+    rfm_df = generate_rfm(df_sales)
+    rfm_scaled, _ = scale_rfm(rfm_df)
+    rfm_df = kmeans_segmentation(rfm_scaled, rfm_df)
+
+    # Churn Labeling
+    rfm_df = label_churn(rfm_df)
+
+    # Churn Prediction
+    rfm_df = churn_prediction_model(rfm_df)
+
+    # Priority Classification
+    rfm_df = classify_priority(rfm_df)
+
+    # Save final output if needed
+    rfm_df.to_csv("data/cleaned/rfm_with_segments.csv", index=False)
+
+
+
+
+
